@@ -1,19 +1,73 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+  terraform_plan:
     runs-on: ubuntu-latest
-    name: A job to say hello
-    steps:
-      # To use this repository's private action,
-      # you must check out the repository
+    name: TF Plan
+    steps:  
+      
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
-        uses: ./ # Uses an action in the root directory
-        id: hello
+
+      - name: Checkout GitHub Action Repo
+        uses: actions/checkout@v2
         with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+          repository: lilium-digital/terraform-actions
+          ref: refs/heads/main
+          token: ${{ secrets.PAT }}
+          path: .github/actions/terraform-actions
+      
+      - name: AWS ECR Login
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.MIKE_FREE_TIER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.MIKE_FREE_TIER_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: TF Plan
+        uses: ./.github/actions/terraform-actions/terraform-plan
+        id: tfplan
+        with:
+          path: /src
+          backend_config: |
+            bucket = testing-mike-c-tfstate
+            key    = github-actions-demo
+            region = eu-west-2
+          add_github_comment: "true"
+  
+  terraform_apply:
+    runs-on: ubuntu-latest
+    name: TF Apply
+    needs: terraform_plan
+    environment:
+      name: Sandbox_TfApply
+    steps:  
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Checkout GitHub Action Repo
+        uses: actions/checkout@v2
+        with:
+          repository: lilium-digital/terraform-actions
+          ref: refs/heads/main
+          token: ${{ secrets.PAT }}
+          path: .github/actions/terraform-actions
+      
+      - name: AWS ECR Login
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.MIKE_FREE_TIER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.MIKE_FREE_TIER_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: TF Plan
+        uses: ./.github/actions/terraform-actions/terraform-apply
+        id: tfapply
+        with:
+          path: /src
+          backend_config: |
+            bucket = testing-mike-c-tfstate
+            key    = github-actions-demo
+            region = eu-west-2
+          add_github_comment: "true"
