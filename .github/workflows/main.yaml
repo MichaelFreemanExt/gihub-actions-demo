@@ -33,7 +33,7 @@ jobs:
           path: /src
           backend_config: |
             bucket = testing-mike-c-tfstate
-            key    = github-actions-demo-test
+            key    = github-actions-demo
             region = eu-west-2
           add_github_comment: "true"
   
@@ -63,13 +63,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.MIKE_FREE_TIER_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
 
-      - name: TF Plan
+      - name: TF Apply
         uses: ./.github/actions/terraform-actions/terraform-apply
         id: tfapply
         with:
           path: /src
           backend_config: |
             bucket = testing-mike-c-tfstate
-            key    = github-actions-demo-test
+            key    = github-actions-demo
             region = eu-west-2
           add_github_comment: "true"
