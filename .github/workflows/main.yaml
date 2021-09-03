@@ -33,7 +33,7 @@ jobs:
           path: /src
           backend_config: |
             bucket = testing-mike-c-tfstate
-            key    = github-actions-demo
+            key    = github-actions-demo-test
             region = eu-west-2
           add_github_comment: "true"
   
@@ -70,6 +70,6 @@ jobs:
           path: /src
           backend_config: |
             bucket = testing-mike-c-tfstate
-            key    = github-actions-demo
+            key    = github-actions-demo-test
             region = eu-west-2
           add_github_comment: "true"
